@@ -15,7 +15,6 @@ class ItemCategory extends StatelessWidget {
         height: 150,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: Colors.black,
             borderRadius: BorderRadiusDirectional.circular(15),
             image: DecorationImage(
                 image: AssetImage(model.image), fit: BoxFit.cover)),
