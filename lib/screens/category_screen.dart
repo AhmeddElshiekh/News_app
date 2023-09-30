@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/widgets/list_item_category.dart';
+import 'package:news_app/models/category_model.dart';
 import 'package:news_app/widgets/sliver_list_news_item.dart';
 
-class NewsLayout extends StatelessWidget {
-   const NewsLayout({super.key});
+class CategoryScreen extends StatelessWidget {
+  const CategoryScreen({super.key, required this.model});
+
+  final CategoryModel model;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,15 +22,11 @@ class NewsLayout extends StatelessWidget {
                 ],
               ),
             )),
-        body:   const Padding(
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 12),
+        body: Padding(
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 12),
           child: CustomScrollView(
-
             slivers: [
-              SliverToBoxAdapter(
-                child: ListItemCategory(),
-              ),
-              ListNewsItemAndCircleIndicator(category: 'General'),
+              ListNewsItemAndCircleIndicator(category: model.name),
             ],
           ),
         ));
