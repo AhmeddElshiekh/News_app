@@ -28,7 +28,7 @@ class NewsLayout extends StatelessWidget {
               SliverToBoxAdapter(
                 child: ListItemCategory(),
               ),
-              ListNewsItem(),
+              ListNewsItemAndCircleIndicator(),
             ],
           ),
         ));
