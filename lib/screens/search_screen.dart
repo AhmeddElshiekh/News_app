@@ -1,47 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/cubit/news_search_cubit/search_cubit.dart';
 import 'package:news_app/widgets/custom_text_form_filed.dart';
 import 'package:news_app/widgets/sliver_list_search_item.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<SearchScreen> {
-var searchController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: CustomScrollView(
-            slivers: [
-              const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 20,
+    return BlocProvider(
+      create: (context) => SearchCubit(),
+      child: BlocBuilder<SearchCubit, SearchStates>(
+        builder: (context, state) {
+          return Scaffold(
+              appBar: AppBar(),
+              body: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: CustomScrollView(
+                  slivers: [
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 20,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: CustomFormFiled(
+                        label: 'Search',
+                        onChanged: (value) {
+                          SearchCubit.get(context).getNewsSearch(value: value);
+                        },
+                      ),
+                    ),
+                    if(state is SearchInitialState)
+                      const SliverFillRemaining(child: Center(child: Text('Search about any new',style: TextStyle(fontSize: 20),))),
+                    if (state is SearchLoadingState)
+                      const SliverFillRemaining(
+                          child: Center(child: CircularProgressIndicator())),
+                    if (state is SearchSuccessState) const ListSearchItem(),
+                    if (state is SearchErrorState)
+                      const SliverFillRemaining(
+                        child: Center(
+                          child:
+                              Text('Oops, there is an error, please try again',style: TextStyle(fontSize: 20),),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: CustomFormFiled(
-                  label: 'Search',
-                  controller: searchController,
-                  onSubmit: (val) {
-                    setState(() {
-
-                    });
-                  },
-                ),
-              ),
-              if(searchController.text.isNotEmpty )
-                ListSearchItem(search: searchController.text)
-            ],
-          ),
-        )
+              ));
+        },
+      ),
     );
-
   }
 }

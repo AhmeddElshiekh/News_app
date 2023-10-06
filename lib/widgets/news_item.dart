@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/cubit/news_cubit.dart';
+import 'package:news_app/cubit/change_theme_cubit/change_them_cubit.dart';
 import 'package:news_app/models/news_model.dart';
 import 'package:news_app/widgets/web_view.dart';
 
@@ -11,8 +11,7 @@ class NewsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NewsCubit, NewsState>(
-  listener: (context, state) {},
+    return BlocBuilder<ChangeThemCubit, ChangeThemState>(
   builder: (context, state) {
     return Padding(
       padding: const EdgeInsetsDirectional.only(top: 22),
@@ -29,12 +28,12 @@ class NewsItem extends StatelessWidget {
               errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
             const SizedBox(height: 12,),
-             Text(model.name ?? '',maxLines: 2,style:  TextStyle(
-              color:NewsCubit.get(context).isLight == true ?  Colors.white : Colors.black,
+            Text(model.name ?? '',maxLines: 2,style:  TextStyle(
+              color:ChangeThemCubit.get(context).isLight == true ?  Colors.white : Colors.black,
               overflow: TextOverflow.ellipsis,
             ),),
             const SizedBox(height: 12,),
-             Text(model.description ?? '',maxLines: 2,style: const TextStyle(
+            Text(model.description ?? '',maxLines: 2,style: const TextStyle(
               color: Colors.grey,
               overflow: TextOverflow.ellipsis,
             ),),
