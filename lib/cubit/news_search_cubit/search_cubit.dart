@@ -12,9 +12,6 @@ class SearchCubit extends Cubit<SearchStates> {
   SearchCubit() : super(SearchInitialState());
   static SearchCubit get (context) => BlocProvider.of(context);
 
-  var searchController = TextEditingController();
-
-
   List<NewsModel> newsList = [];
 
 

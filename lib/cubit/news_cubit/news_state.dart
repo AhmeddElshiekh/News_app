@@ -4,9 +4,8 @@ part of 'news_cubit.dart';
 abstract class NewsState {}
 
 class NewsInitial extends NewsState {}
-class NewsSelectCountryState extends NewsState {}
 
 
-class NewsGetNewsLoadingState extends NewsState {}
-class NewsGetNewsSuccessState extends NewsState {}
-class NewsGetNewsErrorState extends NewsState {}
+class GetNewsLoadingState extends NewsState {}
+class GetNewsSuccessState extends NewsState {}
+class GetNewsErrorState extends NewsState {}

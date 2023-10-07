@@ -1,57 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/services/news_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/cubit/news_cubit/news_cubit.dart';
 import 'package:news_app/widgets/news_item.dart';
+import 'package:news_app/widgets/no_news.dart';
 
-import '../models/news_model.dart';
+class ListNewsItemAndCircleIndicator extends StatelessWidget {
+  const ListNewsItemAndCircleIndicator({
+    super.key,
+    required this.category,
+  });
 
-class ListNewsItemAndCircleIndicator extends StatefulWidget {
-  const ListNewsItemAndCircleIndicator({super.key, required this.category, });
   final String category;
 
   @override
-  State<ListNewsItemAndCircleIndicator> createState() => _ListNewsItemAndCircleIndicatorState();
-}
-var future;
-class _ListNewsItemAndCircleIndicatorState extends State<ListNewsItemAndCircleIndicator> {
-  @override
-  void initState() {
-    future = NewsService().getHttpSearch(search: widget.category);
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<NewsModel>>(
-        future: future,
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
+    return BlocProvider(
+      create: (context) => NewsCubit()
+        ..getNews(
+          category: category,
+        ),
+      child: BlocConsumer<NewsCubit, NewsState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          if (state is GetNewsLoadingState) {
+            return const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (state is GetNewsSuccessState) {
             return SliverList(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) => NewsItem(
-                  model: snapshot.data![index],
+                (context, index) => NewsItem(
+                  model: NewsCubit.get(context).newsList[index],
                 ),
-                childCount: snapshot.data!.length,
+                childCount: NewsCubit.get(context).newsList.length,
               ),
             );
           }
-          else if(snapshot.hasError){
-            return const SliverFillRemaining(
-                child: Center(child: Column(
-                  children: [
-                    Image(image: AssetImage('assets/undraw_Warning_re_eoyh.png')),
-                    Text('Oops, there is an error, please try later',style: TextStyle(
-                        fontSize: 20
-                    )),
-                  ],
-                )));
-
-          }else{
-            return const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()));
+          if (state is GetNewsErrorState) {
+            return const NoNews();
           }
-        });
-
-
+          return const SizedBox();
+        },
+      ),
+    );
   }
 }

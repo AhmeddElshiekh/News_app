@@ -1,127 +1,169 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/cubit/change_theme_cubit/change_them_cubit.dart';
+import 'package:news_app/cubit/check_internet/check_internet_cubit.dart';
 import 'package:news_app/screens/search_screen.dart';
 import 'package:news_app/widgets/change_mode.dart';
 import 'package:news_app/widgets/list_item_category.dart';
-import 'package:news_app/widgets/network_connectivity.dart';
 import 'package:news_app/widgets/sliver_list_news_item.dart';
 
-class NewsLayout extends StatefulWidget {
+class NewsLayout extends StatelessWidget {
   const NewsLayout({super.key});
 
   @override
-  State<NewsLayout> createState() => _NewsLayoutState();
-}
-
-class _NewsLayoutState extends State<NewsLayout> {
-
-  Map _source = {ConnectivityResult.none: false};
-  final NetworkConnectivity _networkConnectivity = NetworkConnectivity.instance;
-  String string = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _networkConnectivity.initialise();
-    _networkConnectivity.myStream.listen((source) {
-      _source = source;
-      if (kDebugMode) {
-        print('source $_source');
-      }
-
-      switch (_source.keys.toList()[0]) {
-        case ConnectivityResult.mobile:
-          string =
-          _source.values.toList()[0] ? 'You are connected to the Internet, you can scroll or search now' : 'Mobile: Offline';
-          break;
-        case ConnectivityResult.wifi:
-          string =
-          _source.values.toList()[0] ? 'You are connected to the Internet, you can scroll or search now' : 'WiFi: Offline';
-          break;
-        case ConnectivityResult.none:
-        default:
-          string = 'You are not connected to the Internet, please check your network';
-      }
-      setState(() {});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor:string == 'You are connected to the Internet, you can scroll or search now' ? Colors.green : Colors.red ,
-          content: Text(
-            string,
-            style:  const TextStyle(fontSize: 20, ),
-          ),
-        ),
-      );
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChangeThemCubit, ChangeThemState>(
-      builder: (context, state) {
+    return BlocConsumer<CheckInternetCubit, CheckInternetState>(
+      listener: (context, state) {
+        if (state is ConnectedState) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(state.message),
+          ));
+        }
+        if (state is NotConnectedState) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(state.message),
+          ));
+        }
+      },
+      builder: (context, states) {
         return Scaffold(
-            appBar: AppBar(
-              title: RichText(
-                text: TextSpan(
-                  text: 'News',
-                  style: TextStyle(
-                      color: ChangeThemCubit.get(context).isLight == true
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 24),
-                  children: const <TextSpan>[
-                    TextSpan(
-                        text: 'Cloud', style: TextStyle(color: Colors.yellow)),
-                  ],
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(end: 12),
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SearchScreen(),
-                            ));
-                      },
-                      icon: const Icon(Icons.search)),
-                ),
-                const ChangeMode(),
-                IconButton(
-                    onPressed: () {
-                      // NewsCubit.get(context).showMemberMenu(context);
-                    },
-                    icon: const Icon(Icons.menu))
+          appBar: AppBar(
+            title: const Row(
+              children: [
+                Text('News'),
+                Text(
+                  'Cloud',
+                  style: TextStyle(color: Colors.yellow),
+                )
               ],
             ),
-            body: const Padding(
-              padding: EdgeInsetsDirectional.symmetric(horizontal: 12),
-              child: CustomScrollView(
-                physics: BouncingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: ListItemCategory(),
-                  ),
-                  ListNewsItemAndCircleIndicator(
-                    category: 'General',
-                  ),
-                ],
+            actions: [
+              Padding(
+                padding: const EdgeInsetsDirectional.only(end: 12),
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SearchScreen(),
+                          ));
+                    },
+                    icon: const Icon(Icons.search)),
               ),
-            ));
+              const ChangeMode(),
+            ],
+          ),
+          body: const Padding(
+            padding: EdgeInsetsDirectional.symmetric(horizontal: 12),
+            child: CustomScrollView(
+              physics: BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: ListItemCategory(),
+                ),
+                ListNewsItemAndCircleIndicator(
+                  category: 'General',
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
-
-
-  @override
-  void dispose() {
-    _networkConnectivity.disposeStream();
-    super.dispose();
-  }
 }
+
+// if (state is NewsSelectCountryState9)
+//   const SliverFillRemaining(
+//     child: Center(
+//         child: Text(
+//             'Please select the country first, if you want to select another country you should select \'سويسرا\' first then select any other country ')),
+//   ),
+// if (state is NewsSelectCountryState1)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'ae',
+//   ),
+// if (state is NewsSelectCountryState2)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'ar',
+//   ),
+// if (state is NewsSelectCountryState3)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'at',
+//   ),
+// if (state is NewsSelectCountryState4)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'au',
+//   ),
+// if (state is NewsSelectCountryState5)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'be',
+//   ),
+// if (state is NewsSelectCountryState6)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'bg',
+//   ),
+// if (state is NewsSelectCountryState7)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'br',
+//   ),
+// if (state is NewsSelectCountryState8)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'ca',
+//   ),
+// if (state is NewsSelectCountryState10)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'cn',
+//   ),
+// if (state is NewsSelectCountryState11)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'co',
+//   ),
+// if (state is NewsSelectCountryState12)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'cz',
+//   ),
+// if (state is NewsSelectCountryState13)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'de',
+//   ),
+// if (state is NewsSelectCountryState14)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'eg',
+//   ),
+// if (state is NewsSelectCountryState15)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'fr',
+//   ),
+// if (state is NewsSelectCountryState16)
+//   const ListNewsItemAndCircleIndicator(
+//     category: 'General',
+//     country: 'us',
+//   ),
+
+// country: ChangeCountryCubit
+//     .get(context)
+// .val ?? 'us',
+
+//
+// if (state is NewsSelectCountryState4)
+// const SliverFillRemaining(
+// child: Center(
+// child: Text(
+// 'Please select the country first, if you want to select another country you should select \'سويسرا\' first then select any other country ')),
+// ),
